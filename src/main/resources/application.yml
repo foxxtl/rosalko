@@ -1,0 +1,49 @@
+application:
+  swagger:
+    enabled: true
+    title: Сервис rosalko-adapter
+    description: Описание API сервиса rosalko-adapter
+    version: 1.0.0
+  monitor:
+    enabled: true
+    rest:
+      incoming: true
+      outgoing: true
+      showBody: true
+      showHeader: true
+      showCookie: false
+
+server:
+  port: 8080
+  servlet:
+    context-path: /rosalko-adapter
+
+spring:
+  application:
+    name: rosalko-adapter
+  main:
+    allow-bean-definition-overriding: true
+  security:
+    oauth2:
+      resourceserver:
+        opaquetoken:
+          introspection-uri:
+      client:
+        registration:
+          uidm:
+            client-id:
+            client-secret:
+            authorization-grant-type: client_credentials
+        provider:
+          uidm:
+            token-uri:
+
+springdoc:
+  swagger-ui:
+    enabled: true
+  packages-to-scan: ru.seventech
+
+pass-error-trace: true
+
+rosalko:
+  html-page-url: https://fsrar.gov.ru/opendata/7710747640-reestr

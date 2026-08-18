@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<configuration>
+
+    <!--logger name="org.mybatis" level="TRACE"/>
+    <logger name="org.camunda.bpm.engine" level="TRACE"/-->
+
+    <conversionRule conversionWord="attr" converterClass="ru.seventech.log.MdcConverter" />
+    <conversionRule conversionWord="tc" converterClass="ru.seventech.log.TargetClassConverter" />
+    <conversionRule conversionWord="rqid" converterClass="ru.seventech.log.RequestIdConverter" />
+
+    <springProperty scope="context" name="ACTIVE_PROFILE" source="spring.profiles.active"/>
+    <springProperty scope="context" name="APP_NAME" source="spring.application.name"/>
+    <springProperty scope="context" name="AMQP_URI" source="application.logs.amqp.uri"/>
+    <springProperty scope="context" name="AMQP_KEY" source="application.logs.amqp.key"/>
+
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} context:[%X] - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <File>${APP_NAME}-${ACTIVE_PROFILE}.log</File>
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} context:[%X] - %msg%n</pattern>
+        </encoder>
+        <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+            <maxIndex>10</maxIndex>
+            <FileNamePattern>${APP_NAME}-${ACTIVE_PROFILE}.log.%i</FileNamePattern>
+        </rollingPolicy>
+        <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+            <MaxFileSize>10MB</MaxFileSize>
+        </triggeringPolicy>
+    </appender>
+
+    <appender name="GELF-AMQP" class="com.github.pukkaone.gelf.logback.GelfAppender">
+        <amqpURI>${AMQP_URI}</amqpURI>
+        <amqpExchange>${AMQP_KEY}</amqpExchange>
+        <amqpRoutingKey>${AMQP_KEY}</amqpRoutingKey>
+        <amqpMaxRetries>5</amqpMaxRetries>
+        <amqpAutomaticRecovery>true</amqpAutomaticRecovery>
+        <originHost>localhost</originHost>
+        <facility>gelf-java</facility>
+        <additionalField>application=${APP_NAME}</additionalField>
+        <mdcIncluded>true</mdcIncluded>
+        <marshaller class="ru.seventech.log.gelf.CustomGelfMessageFactory">
+            <userInfoIncluded>true</userInfoIncluded>
+        </marshaller>
+    </appender>
+
+    <springProfile name="local">
+        <root level="INFO">
+            <appender-ref ref="STDOUT"/>
+            <appender-ref ref="FILE"/>
+        </root>
+    </springProfile>
+
+    <springProfile name="junit">
+        <root level="INFO">
+            <appender-ref ref="STDOUT"/>
+        </root>
+    </springProfile>
+
+    <springProfile name="default">
+        <root level="INFO">
+            <appender-ref ref="STDOUT"/>
+            <appender-ref ref="GELF-AMQP"/>
+        </root>
+    </springProfile>
+</configuration>
