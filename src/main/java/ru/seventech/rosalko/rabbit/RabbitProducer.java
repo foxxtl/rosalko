@@ -15,7 +15,7 @@ public class RabbitProducer {
 
     private final RabbitTemplate rabbitTemplate;
 
-    public RabbitProducer(@Qualifier("rosalkoRabbitTemplate") RabbitTemplate rabbitTemplate) {
+    public RabbitProducer(@Qualifier("transformerRabbitTemplate") RabbitTemplate rabbitTemplate) {
         this.rabbitTemplate = rabbitTemplate;
     }
 
