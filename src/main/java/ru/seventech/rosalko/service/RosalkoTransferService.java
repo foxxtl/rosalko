@@ -53,11 +53,8 @@ public class RosalkoTransferService extends BaseWebClient {
 
             MultipartBodyBuilder builder = new MultipartBodyBuilder();
 
-            builder.asyncPart(
-                    "file",
-                    fileContent,
-                    DataBuffer.class
-            ).filename("rosalko" + format);
+            builder.asyncPart("file", fileContent, DataBuffer.class)
+                    .filename("rosalko" + format);
 
             DocStoreResponseDTO responseDTO = postByUrl(docStoreUrl + downloadUrl, BodyInserters.fromMultipartData(builder.build()), headers(true, MediaType.MULTIPART_FORM_DATA))
                     .bodyToMono(DocStoreResponseDTO.class).block();
