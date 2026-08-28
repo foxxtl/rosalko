@@ -1,14 +1,15 @@
 package ru.seventech.rosalko.service;
 
-import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-import reactor.core.publisher.Mono;
 import ru.seventech.basetemplate.error.CustomMessageException;
 import ru.seventech.rosalko.dto.docstore.DocStoreResponseDTO;
 import ru.seventech.rosalko.rabbit.RabbitProducer;
 
+import java.nio.file.Path;
 import java.time.LocalDateTime;
+import java.util.concurrent.Semaphore;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -20,6 +21,12 @@ public class RosalkoLicenseeService {
     private final RosalkoConnectorService rosalkoConnectorService;
     private final RabbitProducer rabbitProducer;
 
+    /**
+     * Семафор гарантирует, что в один момент времени активен один поток.
+     * Необходимо для исключения возможности одновременной обработки одного файла Росалкогольрегулирования.
+     */
+    private final Semaphore semaphore = new Semaphore(1);
+
     public RosalkoLicenseeService(DocStoreService docStoreService, RosalkoConnectorService rosalkoConnectorService, RabbitProducer rabbitProducer) {
         this.rosalkoConnectorService = rosalkoConnectorService;
         this.docStoreService = docStoreService;
@@ -30,26 +37,25 @@ public class RosalkoLicenseeService {
      * Метод получает html страницу, извлекает из нее url для скачивания .zip архива, получает файл, сохраняет в docstore,
      * передает uuid файла в transformer-service на обработку
      */
+    @Async
     public void refresh() {
-        log.info("Start refreshing rosalko licensees, {}", LocalDateTime.now());
-        String htmlPageUrl = rosalkoConnectorService.getHtmlPage();
-        String archiveUrl = extractDownloadUrl(htmlPageUrl);
-        Mono<DocStoreResponseDTO> docStoreResponse = downloadAndSave(archiveUrl);
-        rabbitProducer.sendTransformerMessage(docStoreResponse.block());
-        log.info("Licensee file send to transformer");
-    }
 
-    @PostConstruct
-    private void init() {
-        refresh();
-    }
+        if (!semaphore.tryAcquire()) {
+            log.warn("Refresh process is already running. Skipping this execution.");
+            return;
+        }
 
-    /**
-     * Метод скачивает архив Россалко и сохраняет в docstore
-     */
-    public Mono<DocStoreResponseDTO> downloadAndSave(String archiveUrl) {
-        return rosalkoConnectorService.downloadFile(archiveUrl, ".zip")
-                .flatMap(docStoreService::saveFile);
+        try {
+            log.info("Start refreshing rosalko licensees, {}", LocalDateTime.now());
+            String htmlPageUrl = rosalkoConnectorService.getHtmlPage();
+            String archiveUrl = extractDownloadUrl(htmlPageUrl);
+            Path tempFilePath = rosalkoConnectorService.downloadFile(archiveUrl, ".zip");
+            DocStoreResponseDTO docStoreResponse = docStoreService.saveFile(tempFilePath);
+            rabbitProducer.sendTransformerMessage(docStoreResponse);
+            log.info("Licensee file send to transformer");
+        } finally {
+            semaphore.release();
+        }
     }
 
     /**
