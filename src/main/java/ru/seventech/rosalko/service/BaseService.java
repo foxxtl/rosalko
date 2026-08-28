@@ -25,13 +25,6 @@ public abstract class BaseService {
         this.rest = rest;
     }
 
-    protected HttpHeaders rosalkoHeaders() {
-        HttpHeaders headers = new HttpHeaders();
-        headers.set(HttpHeaders.USER_AGENT, "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36");
-        headers.set(HttpHeaders.ACCEPT, "*/*");
-        return headers;
-    }
-
     protected HttpHeaders headers(boolean isPublic) {
         return headers(isPublic, MediaType.APPLICATION_JSON);
     }

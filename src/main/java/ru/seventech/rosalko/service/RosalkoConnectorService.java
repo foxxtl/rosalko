@@ -2,29 +2,27 @@ package ru.seventech.rosalko.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
+import org.springframework.core.io.buffer.DataBuffer;
+import org.springframework.core.io.buffer.DataBufferUtils;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.web.reactive.function.client.WebClient;
 import ru.seventech.basetemplate.error.CustomMessageException;
 import ru.seventech.basetemplate.util.BaseSecurityHelper;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.OutputStream;
-import java.net.URI;
 import java.nio.file.Files;
-import java.util.Objects;
+import java.nio.file.Path;
+import java.time.LocalDateTime;
 
-@Service
 @Slf4j
-public class RosalkoConnectorService extends BaseService {
+@Service
+public class RosalkoConnectorService extends BaseWebClient {
 
     @Value(value = "${rosalko.html-page-url}")
     private String rosalkoHtmlPageUrl;
 
-    public RosalkoConnectorService(BaseSecurityHelper securityHelper, RestTemplate rest) {
-        super(securityHelper, rest);
+
+    public RosalkoConnectorService(BaseSecurityHelper securityHelper, WebClient webClient) {
+        super(securityHelper, webClient);
     }
 
     /**
@@ -32,31 +30,40 @@ public class RosalkoConnectorService extends BaseService {
      */
     public String getHtmlPage() {
         try {
-            URI pageUri = URI.create(rosalkoHtmlPageUrl);
-            ResponseEntity<String> result = getRest().exchange(request(rosalkoHeaders(), HttpMethod.GET, pageUri), String.class);
-            return result.getBody();
+            return getByUrl(rosalkoHtmlPageUrl, rosalkoHeaders())
+                    .bodyToMono(String.class)
+                    .block();
         } catch (Exception e) {
             throw new CustomMessageException("Error getting html page", e);
         }
     }
 
+    /**
+     * Метод скачивает файл, параллельно записывая содержимое во временный файл.
+     *
+     * @return - путь к временному файлу
+     */
+    public Path downloadFile(String fileUrl, String format) {
+        Path filePath = null;
 
-    public File downloadFile(String fileUrl, String format) {
         try {
-            log.info("Start download file by url: {}", fileUrl);
-            ResponseEntity<byte[]> result = getRest().exchange(request(rosalkoHeaders(), HttpMethod.GET, URI.create(fileUrl)), byte[].class);
+            log.info("{}. Start download file by url: {}", LocalDateTime.now(), fileUrl);
+            checkParams();
+            filePath = Files.createTempFile("rosalko-", format);
+            Path finalPath = filePath;
 
-            if (Objects.nonNull(result.getBody())) {
-                File file = File.createTempFile("rosalko-", format);
-                Files.write(file.toPath(), result.getBody());
-                log.info("End download file by url: {}", fileUrl);
-                return file;
-            } else {
-                throw new CustomMessageException("Download file is empty");
-            }
+            getByUrl(fileUrl, rosalkoHeaders())
+                    .bodyToFlux(DataBuffer.class)
+                    .as(dataBuffers -> DataBufferUtils.write(dataBuffers, finalPath))
+                    .block();
+            checkParams();
+            log.info("{}. End download file by url: {}", LocalDateTime.now(), fileUrl);
+            return filePath;
         } catch (Exception e) {
+            deleteTempFile(filePath);
             throw new CustomMessageException("Error while download file by url: " + fileUrl, e);
         }
     }
+
 
 }

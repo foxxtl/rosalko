@@ -12,6 +12,10 @@ application:
       showBody: true
       showHeader: true
       showCookie: false
+  logs:
+    amqp:
+      uri: amqp://amq:amq@localhost:5672
+      key: logs.local
 
 server:
   port: 8080
@@ -27,7 +31,8 @@ spring:
     oauth2:
       resourceserver:
         opaquetoken:
-          introspection-uri:
+          introspection-uri: http://uidm.uidm-dev.d.exportcenter.ru/sso/oauth2/tokeninfo
+#            introspection-uri: https://lk.t.exportcenter.ru/sso/oauth2/tokeninfo
       client:
         registration:
           uidm:
@@ -36,22 +41,24 @@ spring:
             authorization-grant-type: client_credentials
         provider:
           uidm:
-            token-uri:
+            token-uri: http://uidm.uidm-dev.d.exportcenter.ru/sso/oauth2/access_token
+#            token-uri: https://lk.t.exportcenter.ru/sso/oauth2/access_token
 
 springdoc:
   swagger-ui:
     enabled: true
   packages-to-scan: ru.seventech
 
+smev:
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+
 pass-error-trace: true
 
-rosalko:
-  html-page-url: https://fsrar.gov.ru/opendata/7710747640-reestr
+
 
 storage-url:
-  download-url: /api/v2/
-
-webclient:
-  http:
-    connect-timeout: 10000    # 10 секунд
-    response-timeout: 1800000 # 30 минут
+  base-url: http://localhost:8082/docstore

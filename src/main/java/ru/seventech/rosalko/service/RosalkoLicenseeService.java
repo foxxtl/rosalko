@@ -1,5 +1,6 @@
 package ru.seventech.rosalko.service;
 
+import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -7,7 +8,8 @@ import ru.seventech.basetemplate.error.CustomMessageException;
 import ru.seventech.rosalko.dto.docstore.DocStoreResponseDTO;
 import ru.seventech.rosalko.rabbit.RabbitProducer;
 
-import java.io.File;
+import java.nio.file.Path;
+import java.time.LocalDateTime;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -31,13 +33,18 @@ public class RosalkoLicenseeService {
      */
     @Async
     public void refresh() {
-        log.info("Start refreshing rosalko licensees");
+        log.info("Start refreshing rosalko licensees, {}", LocalDateTime.now());
         String htmlPageUrl = rosalkoConnectorService.getHtmlPage();
         String url = extractDownloadUrl(htmlPageUrl);
-        File zipFile = rosalkoConnectorService.downloadFile(url, ".zip");
-        DocStoreResponseDTO docStoreResponseDTO = docStoreService.saveFile(zipFile);
-        rabbitProducer.sendTransformerMessage(docStoreResponseDTO);
+        Path filePath = rosalkoConnectorService.downloadFile(url, ".zip");
+        DocStoreResponseDTO docStoreResponseDTO = docStoreService.saveFile(filePath);
+//        rabbitProducer.sendTransformerMessage(docStoreResponseDTO);
         log.info("Licensee file send to transformer");
+    }
+
+    @PostConstruct
+    private void init() {
+        refresh();
     }
 
 
