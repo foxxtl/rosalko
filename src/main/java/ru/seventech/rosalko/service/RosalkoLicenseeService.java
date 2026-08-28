@@ -15,10 +15,8 @@ import java.util.regex.Pattern;
 @Slf4j
 public class RosalkoLicenseeService {
 
-
     private final RosalkoTransferService rosalkoTransferService;
     private final RabbitProducer rabbitProducer;
-
 
     /**
      * Семафор гарантирует, что в один момент времени активен один поток.
