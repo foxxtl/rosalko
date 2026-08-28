@@ -46,7 +46,7 @@ public class RosalkoLicenseeService {
         }
 
         try {
-            log.info("Start refreshing rosalko licensees, {}", LocalDateTime.now());
+            log.info("Start refreshing rosalko licensees");
             String htmlPageUrl = rosalkoConnectorService.getHtmlPage();
             String archiveUrl = extractDownloadUrl(htmlPageUrl);
             Path tempFilePath = rosalkoConnectorService.downloadFile(archiveUrl, ".zip");
