@@ -59,7 +59,7 @@ public class RosalkoTransferService extends BaseWebClient {
             DocStoreResponseDTO responseDTO = postByUrl(docStoreUrl + downloadUrl, BodyInserters.fromMultipartData(builder.build()), headers(true, MediaType.MULTIPART_FORM_DATA))
                     .bodyToMono(DocStoreResponseDTO.class).block();
 
-            log.info("End transfer file url: {}. Docstore uuid: {}", fileUrl, responseDTO.getFile_uuid());
+            log.info("End transfer file from url: {}. Docstore uuid: {}", fileUrl, responseDTO.getFile_uuid());
             return responseDTO;
         } catch (Exception e) {
             throw new CustomMessageException("Error while transfer file by url: " + fileUrl, e);
