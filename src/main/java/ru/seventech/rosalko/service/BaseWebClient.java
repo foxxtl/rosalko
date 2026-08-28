@@ -65,7 +65,6 @@ abstract class BaseWebClient {
         };
     }
 
-
     protected Consumer<HttpHeaders> headers(boolean isPublic, MediaType contentType) {
         return headers -> {
             headers.setContentType(contentType);
@@ -86,7 +85,7 @@ abstract class BaseWebClient {
 
     private void prepareAuthenticationHeader(HttpHeaders headers, boolean isPublic) {
         if (isPublic) {
-            headers.set("Authorization", securityHelper.obtainSysAuthToken());
+            headers.set("Authorization", getToken());
         } else {
             String token = securityHelper.prepareAuthenticationHeader();
             if (isNull(token)) {
@@ -96,21 +95,8 @@ abstract class BaseWebClient {
         }
     }
 
-    protected void checkParams(){
-        Runtime runtime = Runtime.getRuntime();
-
-        long maxMemory = runtime.maxMemory();
-        long totalMemory = runtime.totalMemory();
-        long freeMemory = runtime.freeMemory();
-        long usedMemory = totalMemory - freeMemory;
-
-        log.info(
-                "Heap: used={} MB, total={} MB, max={} MB",
-                usedMemory / 1024 / 1024,
-                totalMemory / 1024 / 1024,
-                maxMemory / 1024 / 1024
-        );
+    protected String getToken() {
+        return securityHelper.obtainSysAuthToken();
     }
-
 
 }

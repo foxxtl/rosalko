@@ -5,10 +5,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
 import ru.seventech.basetemplate.error.CustomMessageException;
 import ru.seventech.basetemplate.util.BaseSecurityHelper;
 import ru.seventech.rosalko.dto.docstore.DocStoreResponseDTO;
@@ -33,24 +33,19 @@ public class DocStoreService extends BaseWebClient {
         this.objectMapper = objectMapper;
     }
 
-    public DocStoreResponseDTO saveFile(Path filePath) {
-        try {
-            log.info("{}. Start save file", LocalDateTime.now());
-            checkParams();
-            ResponseEntity<String> response = postByUrl(docStoreUrl + downloadUrl, multipartBody(filePath), headers(true, MediaType.MULTIPART_FORM_DATA))
-                    .toEntity(String.class)
-                    .block();
-
-            checkParams();
-            log.info("{}. Start save file {}", LocalDateTime.now(), response);
-
-            return objectMapper.readValue(response.getBody(), DocStoreResponseDTO.class);
-
-        } catch (Exception e) {
-            throw new CustomMessageException("Error while save file to docstore", e);
-        } finally {
-            deleteTempFile(filePath);
-        }
+    public Mono<DocStoreResponseDTO> saveFile(Path filePath) {
+        return Mono.defer(() -> postByUrl(docStoreUrl + downloadUrl, multipartBody(filePath), headers(true, MediaType.MULTIPART_FORM_DATA))
+                .toEntity(String.class)
+                .map(response -> {
+                    try {
+                        log.info("FILE SAVED: {}", objectMapper.writeValueAsString(response));
+                        return objectMapper.readValue(response.getBody(), DocStoreResponseDTO.class);
+                    } catch (Exception e) {
+                        throw new CustomMessageException("Error parsing docstore response", e);
+                    }
+                }))
+                .onErrorMap(e -> new CustomMessageException("Error while save file to docstore", e))
+                .doFinally(it -> deleteTempFile(filePath));
     }
 
     private BodyInserters.MultipartInserter multipartBody(Path filePath) {

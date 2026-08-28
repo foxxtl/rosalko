@@ -2,13 +2,12 @@ package ru.seventech.rosalko.service;
 
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Mono;
 import ru.seventech.basetemplate.error.CustomMessageException;
 import ru.seventech.rosalko.dto.docstore.DocStoreResponseDTO;
 import ru.seventech.rosalko.rabbit.RabbitProducer;
 
-import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -31,14 +30,12 @@ public class RosalkoLicenseeService {
      * Метод получает html страницу, извлекает из нее url для скачивания .zip архива, получает файл, сохраняет в docstore,
      * передает uuid файла в transformer-service на обработку
      */
-    @Async
     public void refresh() {
         log.info("Start refreshing rosalko licensees, {}", LocalDateTime.now());
         String htmlPageUrl = rosalkoConnectorService.getHtmlPage();
-        String url = extractDownloadUrl(htmlPageUrl);
-        Path filePath = rosalkoConnectorService.downloadFile(url, ".zip");
-        DocStoreResponseDTO docStoreResponseDTO = docStoreService.saveFile(filePath);
-//        rabbitProducer.sendTransformerMessage(docStoreResponseDTO);
+        String archiveUrl = extractDownloadUrl(htmlPageUrl);
+        Mono<DocStoreResponseDTO> docStoreResponse = downloadAndSave(archiveUrl);
+        rabbitProducer.sendTransformerMessage(docStoreResponse.block());
         log.info("Licensee file send to transformer");
     }
 
@@ -47,6 +44,13 @@ public class RosalkoLicenseeService {
         refresh();
     }
 
+    /**
+     * Метод скачивает архив Россалко и сохраняет в docstore
+     */
+    public Mono<DocStoreResponseDTO> downloadAndSave(String archiveUrl) {
+        return rosalkoConnectorService.downloadFile(archiveUrl, ".zip")
+                .flatMap(docStoreService::saveFile);
+    }
 
     /**
      * Метод извлекает с html страницы URL на скачивание zip архива

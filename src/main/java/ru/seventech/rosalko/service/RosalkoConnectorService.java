@@ -6,12 +6,13 @@ import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.core.io.buffer.DataBufferUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
 import ru.seventech.basetemplate.error.CustomMessageException;
 import ru.seventech.basetemplate.util.BaseSecurityHelper;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.time.LocalDateTime;
 
 @Slf4j
 @Service
@@ -19,7 +20,6 @@ public class RosalkoConnectorService extends BaseWebClient {
 
     @Value(value = "${rosalko.html-page-url}")
     private String rosalkoHtmlPageUrl;
-
 
     public RosalkoConnectorService(BaseSecurityHelper securityHelper, WebClient webClient) {
         super(securityHelper, webClient);
@@ -43,27 +43,22 @@ public class RosalkoConnectorService extends BaseWebClient {
      *
      * @return - путь к временному файлу
      */
-    public Path downloadFile(String fileUrl, String format) {
-        Path filePath = null;
+    public Mono<Path> downloadFile(String archiveUrl, String format) {
+        return Mono.defer(() -> {
+            try {
+                log.info("Start download file by url: {}", archiveUrl);
+                Path filePath = Files.createTempFile("rosalko-", format);
 
-        try {
-            log.info("{}. Start download file by url: {}", LocalDateTime.now(), fileUrl);
-            checkParams();
-            filePath = Files.createTempFile("rosalko-", format);
-            Path finalPath = filePath;
-
-            getByUrl(fileUrl, rosalkoHeaders())
-                    .bodyToFlux(DataBuffer.class)
-                    .as(dataBuffers -> DataBufferUtils.write(dataBuffers, finalPath))
-                    .block();
-            checkParams();
-            log.info("{}. End download file by url: {}", LocalDateTime.now(), fileUrl);
-            return filePath;
-        } catch (Exception e) {
-            deleteTempFile(filePath);
-            throw new CustomMessageException("Error while download file by url: " + fileUrl, e);
-        }
+                return getByUrl(archiveUrl, rosalkoHeaders())
+                        .bodyToFlux(DataBuffer.class)
+                        .as(dataBuffers -> DataBufferUtils.write(dataBuffers, filePath))
+                        .then(Mono.fromRunnable(() -> log.info("End download file by url: {}", archiveUrl)))
+                        .thenReturn(filePath)
+                        .doOnError(e -> deleteTempFile(filePath));
+            } catch (IOException e) {
+                return Mono.error(new CustomMessageException("Error creating temp file", e));
+            }
+        });
     }
-
 
 }
