@@ -30,9 +30,6 @@ public class RabbitConfig {
     public static final String ROSALKO_QUEUE = "q.mdm.transform.rosalko.job";
     public static final String ROSALKO_EXCHANGE = "t.mdm.transform.rosalko.job";
 
-    public static final String ROSALKO_ERROR_QUEUE = "q.mdm.transform.rosalko.job.error";
-    public static final String ROSALKO_ERROR_EXCHANGE = "t.mdm.transform.rosalko.job.error";
-
     @Bean
     @Primary
     public ObjectMapper objectMapper() {
@@ -49,15 +46,15 @@ public class RabbitConfig {
         return new Jackson2JsonMessageConverter(objectMapper());
     }
 
-    @ConfigurationProperties(prefix = "rosalko.rabbitmq")
-    @Bean(name = "rosalkoRabbitConnection")
+    @ConfigurationProperties(prefix = "transformer.rabbitmq")
+    @Bean(name = "transformerRabbitConnection")
     @Primary
-    public ConnectionFactory rosalkoRabbitConnection() {
+    public ConnectionFactory transformerRabbitConnection() {
         return new CachingConnectionFactory();
     }
 
-    @Bean(name = "rosalkoRabbitTemplate")
-    public RabbitTemplate rosalkoRabbitTemplate(@Qualifier("rosalkoRabbitConnection") ConnectionFactory connectionFactory,
+    @Bean(name = "transformerRabbitTemplate")
+    public RabbitTemplate transformerRabbitTemplate(@Qualifier("transformerRabbitConnection") ConnectionFactory connectionFactory,
                                                 MessageConverter messageConverter) {
         RabbitTemplate rabbitTemplate = new RabbitTemplate(connectionFactory);
         rabbitTemplate.setMessageConverter(messageConverter);
@@ -79,22 +76,6 @@ public class RabbitConfig {
     Binding rosalkoInputBinding(@Qualifier("rosalkoQueue") Queue rosalkoQueue,
                                 @Qualifier("rosalkoExchange") Exchange rosalkoExchange) {
         return BindingBuilder.bind(rosalkoQueue).to(rosalkoExchange).with(ROSALKO_QUEUE).noargs();
-    }
-
-    @Bean("rosalkoErrorExchange")
-    DirectExchange rosalkoErrorExchange() {
-        return new DirectExchange(ROSALKO_ERROR_EXCHANGE);
-    }
-
-    @Bean(name = "rosalkoErrorQueue")
-    Queue rosalkoErrorQueue() {
-        return QueueBuilder.durable(ROSALKO_ERROR_QUEUE).build();
-    }
-
-    @Bean
-    Binding rosalkoErrorBinding(@Qualifier("rosalkoErrorQueue") Queue rosalkoErrorQueue,
-                                @Qualifier("rosalkoErrorExchange") Exchange rosalkoErrorExchange) {
-        return BindingBuilder.bind(rosalkoErrorQueue).to(rosalkoErrorExchange).with(ROSALKO_ERROR_QUEUE).noargs();
     }
 
 }

@@ -13,6 +13,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.net.URI;
+import java.nio.file.Files;
 import java.util.Objects;
 
 @Service
@@ -47,9 +48,7 @@ public class RosalkoConnectorService extends BaseService {
 
             if (Objects.nonNull(result.getBody())) {
                 File file = File.createTempFile("rosalko-", format);
-                try (OutputStream outputStream = new FileOutputStream(file)) {
-                    outputStream.write(result.getBody());
-                }
+                Files.write(file.toPath(), result.getBody());
                 log.info("End download file by url: {}", fileUrl);
                 return file;
             } else {

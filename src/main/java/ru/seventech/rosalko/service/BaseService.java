@@ -6,10 +6,12 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.RequestEntity;
 import org.springframework.web.client.RestTemplate;
+import ru.seventech.basetemplate.error.CustomMessageException;
 import ru.seventech.basetemplate.util.BaseSecurityHelper;
 
 import java.net.URI;
 
+import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 
 @Getter
@@ -54,10 +56,10 @@ public abstract class BaseService {
             headers.set("Authorization", securityHelper.obtainSysAuthToken());
         } else {
             String token = securityHelper.prepareAuthenticationHeader();
-
-            if (nonNull(token)) {
-                headers.set("Authorization", token);
+            if (isNull(token)) {
+                throw new CustomMessageException("Authentication header is missing");
             }
+            headers.set("Authorization", token);
         }
     }
 
