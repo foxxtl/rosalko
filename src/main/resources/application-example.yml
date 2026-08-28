@@ -49,7 +49,7 @@ springdoc:
     enabled: true
   packages-to-scan: ru.seventech
 
-smev:
+transformer:
   rabbitmq:
     host: localhost
     port: 5672
