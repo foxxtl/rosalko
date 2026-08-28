@@ -1,7 +1,7 @@
 package ru.seventech.rosalko.service;
 
-import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import ru.seventech.basetemplate.error.CustomMessageException;
 import ru.seventech.rosalko.dto.docstore.DocStoreResponseDTO;
@@ -33,7 +33,7 @@ public class RosalkoLicenseeService {
      * Метод получает html страницу, извлекает из нее url для скачивания .zip архива, получает файл, сохраняет в docstore,
      * передает uuid файла в transformer-service на обработку
      */
-    @PostConstruct
+    @Async
     public void refresh() {
 
         if (!semaphore.tryAcquire()) {
