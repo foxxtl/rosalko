@@ -8,6 +8,7 @@ import org.springframework.web.reactive.function.BodyInserter;
 import org.springframework.web.reactive.function.client.WebClient;
 import ru.seventech.basetemplate.error.CustomMessageException;
 import ru.seventech.basetemplate.util.BaseSecurityHelper;
+import ru.seventech.log.utils.RequestHelper;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -68,6 +69,7 @@ abstract class BaseWebClient {
     protected Consumer<HttpHeaders> headers(boolean isPublic, MediaType contentType) {
         return headers -> {
             headers.setContentType(contentType);
+            headers.set("request_id", RequestHelper.getRequestId());
             prepareAuthenticationHeader(headers, isPublic);
         };
     }
