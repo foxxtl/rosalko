@@ -19,25 +19,32 @@ import java.util.function.Consumer;
 import static java.util.Objects.isNull;
 
 @Slf4j
-abstract class BaseWebClient {
+public abstract class BaseWebClient {
 
     private final BaseSecurityHelper securityHelper;
     private final WebClient webClient;
 
-    BaseWebClient(BaseSecurityHelper securityHelper, WebClient webClient) {
+    public BaseWebClient(BaseSecurityHelper securityHelper, WebClient webClient) {
         this.securityHelper = securityHelper;
         this.webClient = webClient;
     }
 
+    /**
+     * Дополнительная конфигурация, так как запрос в ivis возвращает тяжелый json
+     */
     protected WebClient getClient() {
-        return webClient;
+        return webClient.mutate()
+                .codecs(configurer -> configurer
+                        .defaultCodecs()
+                        .maxInMemorySize(5 * 1024 * 1024)) // 5мб
+                .build();
     }
 
     /**
      * Подготовка GET запроса
      */
     protected WebClient.ResponseSpec getByUrl(String url, Consumer<HttpHeaders> headers) {
-        return webClient
+        return getClient()
                 .get()
                 .uri(url)
                 .headers(headers)
@@ -68,10 +75,21 @@ abstract class BaseWebClient {
 
     protected Consumer<HttpHeaders> headers(boolean isPublic, MediaType contentType) {
         return headers -> {
-            headers.setContentType(contentType);
-            headers.set("request_id", RequestHelper.getRequestId());
+            commonHeader(headers, contentType);
             prepareAuthenticationHeader(headers, isPublic);
         };
+    }
+
+    protected Consumer<HttpHeaders> basicAuthHeaders(String user, String password) {
+        return headers -> {
+            commonHeader(headers, MediaType.APPLICATION_JSON);
+            headers.setBasicAuth(user, password);
+        };
+    }
+
+    private void commonHeader(HttpHeaders headers, MediaType contentType) {
+        headers.setContentType(contentType);
+        headers.set("request_id", RequestHelper.getRequestId());
     }
 
     protected void deleteTempFile(Path file) {

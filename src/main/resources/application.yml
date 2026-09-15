@@ -48,6 +48,19 @@ pass-error-trace: true
 rosalko:
   html-page-url: https://fsrar.gov.ru/opendata/7710747640-reestr
 
+ivis:
+  request:
+    url: https://licreestr.fsvps.ru/api/license-rec
+    username:
+    password:
+  caches:
+    farma:
+      sphere: 1
+      capacity: 1_000
+    medical:
+      sphere: 2
+      capacity: 20_000
+
 storage-url:
   download-url: /api/v2/
 
@@ -55,3 +68,8 @@ webclient:
   http:
     connect-timeout: 10000    # 10 секунд
     response-timeout: 1800000 # 30 минут
+
+
+
+
+
