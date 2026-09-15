@@ -8,6 +8,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import ru.seventech.basetemplate.error.CustomMessageException;
 import ru.seventech.rosalko.dto.docstore.DocStoreResponseDTO;
 import ru.seventech.rosalko.rabbit.RabbitProducer;
+import ru.seventech.rosalko.service.rosalko.RosalkoLicenseeService;
+import ru.seventech.rosalko.service.rosalko.RosalkoTransferService;
 
 import java.util.concurrent.Semaphore;
 

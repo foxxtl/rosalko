@@ -3,31 +3,25 @@ package ru.seventech.rosalko.service;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
-import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.reactive.function.BodyInserter;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import java.util.function.Consumer;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.core.io.buffer.DefaultDataBufferFactory;
 import ru.seventech.basetemplate.error.CustomMessageException;
 import ru.seventech.basetemplate.util.BaseSecurityHelper;
 import ru.seventech.rosalko.dto.docstore.DocStoreResponseDTO;
-import org.springframework.http.HttpHeaders;
-
-import java.util.function.Consumer;
+import ru.seventech.rosalko.service.rosalko.RosalkoTransferService;
 
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class RosalkoTransferServiceTest {

@@ -6,11 +6,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import ru.seventech.rosalko.service.RosalkoLicenseeService;
+import ru.seventech.rosalko.service.rosalko.RosalkoLicenseeService;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping(value = "/api/v1/licensee")
+@RequestMapping(value = "/api/v1/rosalko-licences")
 public class RosalkoLicenseeController {
 
     private final RosalkoLicenseeService rosalkoLicenseeService;

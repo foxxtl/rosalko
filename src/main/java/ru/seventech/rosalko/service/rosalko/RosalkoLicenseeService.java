@@ -1,4 +1,4 @@
-package ru.seventech.rosalko.service;
+package ru.seventech.rosalko.service.rosalko;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;

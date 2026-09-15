@@ -1,4 +1,4 @@
-package ru.seventech.rosalko.service;
+package ru.seventech.rosalko.service.rosalko;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -12,6 +12,7 @@ import reactor.core.publisher.Flux;
 import ru.seventech.basetemplate.error.CustomMessageException;
 import ru.seventech.basetemplate.util.BaseSecurityHelper;
 import ru.seventech.rosalko.dto.docstore.DocStoreResponseDTO;
+import ru.seventech.rosalko.service.BaseWebClient;
 
 @Slf4j
 @Service
