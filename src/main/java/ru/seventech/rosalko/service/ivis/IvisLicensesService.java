@@ -43,7 +43,7 @@ public class IvisLicensesService extends BaseWebClient {
     }
 
     public IvisResponseDto search(IvisRequestDto requestDto) {
-        IvisResponseDto  response = cacheService.search(requestDto);
+        IvisResponseDto response = cacheService.search(requestDto);
         if (Objects.isNull(response)) {
             throw new NotFoundException(requestDto.getSphere(), "Документ с указанными реквизитами не найден.");
         }
