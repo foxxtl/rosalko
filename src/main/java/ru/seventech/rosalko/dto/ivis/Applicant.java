@@ -8,5 +8,6 @@ import lombok.Setter;
 public class Applicant {
 
     private String name;
+
     private String inn;
 }

@@ -54,7 +54,7 @@ public class IvisCacheService {
     }
 
     /**
-     * Если передан невалидный sphere, выбрасываем исключение
+     * Проверяем сконфигурирован ли передаваемый sphere
      */
     public void checkSphere(Integer sphere) {
         if (!cacheMap.containsKey(sphere)) {
