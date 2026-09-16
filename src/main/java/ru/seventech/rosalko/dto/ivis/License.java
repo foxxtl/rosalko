@@ -2,13 +2,15 @@ package ru.seventech.rosalko.dto.ivis;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
 
 import java.time.LocalDate;
 import java.util.Objects;
 
-@Data
+@Getter
+@Setter
 public class License {
 
     private String number;

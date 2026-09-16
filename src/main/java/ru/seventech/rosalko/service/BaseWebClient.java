@@ -30,7 +30,7 @@ public abstract class BaseWebClient {
     }
 
     /**
-     * Дополнительная конфигурация, так как запрос в ivis возвращает тяжелый json
+     * Расширенный буфер необходим для получения ответа от ИВИС
      */
     protected WebClient getClient() {
         return webClient.mutate()
@@ -80,10 +80,10 @@ public abstract class BaseWebClient {
         };
     }
 
-    protected Consumer<HttpHeaders> basicAuthHeaders(String user, String password) {
+    protected Consumer<HttpHeaders> basicAuthHeaders(String username, String password) {
         return headers -> {
             commonHeader(headers, MediaType.APPLICATION_JSON);
-            headers.setBasicAuth(user, password);
+            headers.setBasicAuth(username, password);
         };
     }
 

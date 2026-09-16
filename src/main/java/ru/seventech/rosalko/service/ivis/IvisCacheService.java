@@ -18,9 +18,6 @@ import java.util.stream.Collectors;
 @Service
 public class IvisCacheService {
 
-    /**
-     * Под каждый тип лицензии определяется свой кеш
-     */
     private final Map<Integer, Cache<IvisCacheKey, IvisResponseDto>> cacheMap = new HashMap<>();
 
     public IvisCacheService(IvisCacheConfig cacheConfig) {
@@ -64,7 +61,6 @@ public class IvisCacheService {
             throw new IllegalArgumentException("Unsupported sphere: " + sphere);
         }
     }
-
 
     private Cache<IvisCacheKey, IvisResponseDto> createCache(int capacity) {
         return Caffeine.newBuilder().maximumSize(capacity).build();

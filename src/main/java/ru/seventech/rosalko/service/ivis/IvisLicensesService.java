@@ -18,7 +18,7 @@ import java.util.List;
 
 @Slf4j
 @Service
-public class IvisLicenseeService extends BaseWebClient {
+public class IvisLicensesService extends BaseWebClient {
 
     private final IvisWebConfig webConfig;
 
@@ -26,7 +26,7 @@ public class IvisLicenseeService extends BaseWebClient {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    public IvisLicenseeService(BaseSecurityHelper securityHelper, WebClient webClient,
+    public IvisLicensesService(BaseSecurityHelper securityHelper, WebClient webClient,
                                IvisWebConfig webConfig, IvisCacheService cacheService) {
         super(securityHelper, webClient);
         this.cacheService = cacheService;

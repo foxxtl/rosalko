@@ -1,8 +1,10 @@
 package ru.seventech.rosalko.dto.ivis;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
 public class Applicant {
 
     private String name;

@@ -11,25 +11,25 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import ru.seventech.rosalko.dto.ivis.IvisRequestDto;
 import ru.seventech.rosalko.dto.ivis.IvisResponseDto;
-import ru.seventech.rosalko.service.ivis.IvisLicenseeService;
+import ru.seventech.rosalko.service.ivis.IvisLicensesService;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping(value = "/api/v1/ivis-licences")
-public class IvisLicenseeController {
+public class IvisLicensesController {
 
-    private final IvisLicenseeService ivisLicenseeService;
+    private final IvisLicensesService ivisLicensesService;
 
     @GetMapping("/refresh")
     @Operation(summary = "Добавляет лицензии Россельхознадзора в кеш приложения")
     public ResponseEntity<Object> refresh(@RequestParam Integer sphere) {
-        ivisLicenseeService.refresh(sphere);
+        ivisLicensesService.refresh(sphere);
         return ResponseEntity.ok("Задача на обновление лицензий Россельхознадзора успешно запущена");
     }
 
     @GetMapping("/search")
     @Operation(summary = "Поиск лицензии Россельхознадзора")
     public IvisResponseDto search(@RequestBody @Valid IvisRequestDto requestDto) {
-        return ivisLicenseeService.search(requestDto);
+        return ivisLicensesService.search(requestDto);
     }
 }

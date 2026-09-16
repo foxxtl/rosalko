@@ -1,13 +1,15 @@
 package ru.seventech.rosalko.dto.ivis;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-@Data
+@Getter
+@Setter
 public class IvisResponseDto {
 
     private UUID id;

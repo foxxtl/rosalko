@@ -68,8 +68,3 @@ webclient:
   http:
     connect-timeout: 10000    # 10 секунд
     response-timeout: 1800000 # 30 минут
-
-
-
-
-
