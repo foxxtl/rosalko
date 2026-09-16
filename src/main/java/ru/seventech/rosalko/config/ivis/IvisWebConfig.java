@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 @Getter
 @Setter
 @Component
-@ConfigurationProperties(prefix = "ivis.request")
+@ConfigurationProperties(prefix = "ivis.web")
 public class IvisWebConfig {
 
     private String url;

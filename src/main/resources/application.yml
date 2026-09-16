@@ -49,7 +49,7 @@ rosalko:
   html-page-url: https://fsrar.gov.ru/opendata/7710747640-reestr
 
 ivis:
-  request:
+  web:
     url: https://licreestr.fsvps.ru/api/license-rec
     username:
     password:
