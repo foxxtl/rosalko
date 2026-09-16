@@ -3,7 +3,6 @@ package ru.seventech.rosalko.service.ivis;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import org.springframework.stereotype.Service;
-import ru.seventech.basetemplate.error.NotFoundException;
 import ru.seventech.rosalko.config.ivis.IvisCacheConfig;
 import ru.seventech.rosalko.dto.ivis.IvisCacheKey;
 import ru.seventech.rosalko.dto.ivis.IvisRequestDto;
