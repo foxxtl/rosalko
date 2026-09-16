@@ -3,6 +3,7 @@ package ru.seventech.rosalko.service.ivis;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import org.springframework.stereotype.Service;
+import ru.seventech.basetemplate.error.NotFoundException;
 import ru.seventech.rosalko.config.ivis.IvisCacheConfig;
 import ru.seventech.rosalko.dto.ivis.IvisCacheKey;
 import ru.seventech.rosalko.dto.ivis.IvisRequestDto;
@@ -50,7 +51,11 @@ public class IvisCacheService {
     public IvisResponseDto search(IvisRequestDto requestDto) {
         checkSphere(requestDto.getSphere());
         IvisCacheKey key = new IvisCacheKey(requestDto.getNumber(), requestDto.getDateStart());
-        return cacheMap.get(requestDto.getSphere()).getIfPresent(key);
+        IvisResponseDto response = cacheMap.get(requestDto.getSphere()).getIfPresent(key);
+        if (Objects.isNull(response)) {
+            throw new NotFoundException(requestDto.getSphere(), "Документ с указанными реквизитами не найден.");
+        }
+        return response;
     }
 
     /**
