@@ -51,11 +51,7 @@ public class IvisCacheService {
     public IvisResponseDto search(IvisRequestDto requestDto) {
         checkSphere(requestDto.getSphere());
         IvisCacheKey key = new IvisCacheKey(requestDto.getNumber(), requestDto.getDateStart());
-        IvisResponseDto response = cacheMap.get(requestDto.getSphere()).getIfPresent(key);
-        if (Objects.isNull(response)) {
-            throw new NotFoundException(requestDto.getSphere(), "Документ с указанными реквизитами не найден.");
-        }
-        return response;
+        return cacheMap.get(requestDto.getSphere()).getIfPresent(key);
     }
 
     /**

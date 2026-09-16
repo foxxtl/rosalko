@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriComponentsBuilder;
 import ru.seventech.basetemplate.error.CustomMessageException;
+import ru.seventech.basetemplate.error.NotFoundException;
 import ru.seventech.basetemplate.util.BaseSecurityHelper;
 import ru.seventech.rosalko.config.ivis.IvisWebConfig;
 import ru.seventech.rosalko.dto.ivis.IvisRequestDto;
@@ -15,6 +16,7 @@ import ru.seventech.rosalko.dto.ivis.IvisResponseDto;
 import ru.seventech.rosalko.service.BaseWebClient;
 
 import java.util.List;
+import java.util.Objects;
 
 @Slf4j
 @Service
@@ -41,7 +43,11 @@ public class IvisLicensesService extends BaseWebClient {
     }
 
     public IvisResponseDto search(IvisRequestDto requestDto) {
-        return cacheService.search(requestDto);
+        IvisResponseDto  response = cacheService.search(requestDto);
+        if (Objects.isNull(response)) {
+            throw new NotFoundException(requestDto.getSphere(), "Документ с указанными реквизитами не найден.");
+        }
+        return response;
     }
 
     /**
