@@ -2,6 +2,7 @@ package ru.seventech.rosalko.service.ivis;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.seventech.rosalko.config.ivis.IvisCacheConfig;
 import ru.seventech.rosalko.dto.ivis.IvisCacheKey;
@@ -15,6 +16,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 public class IvisCacheService {
 
@@ -58,6 +60,7 @@ public class IvisCacheService {
      */
     public void checkSphere(Integer sphere) {
         if (!cacheMap.containsKey(sphere)) {
+            log.error("Sphere {} is not supported. The current spheres are contained in the application configuration", sphere);
             throw new IllegalArgumentException("Unsupported sphere: " + sphere);
         }
     }

@@ -20,7 +20,7 @@ public class WebClientConfig {
     private int responseTimeout;
 
     @Bean
-    public WebClient rosalkoWebClient(WebClient.Builder builder) {
+    public WebClient webClient(WebClient.Builder builder) {
 
         HttpClient httpClient = HttpClient.create()
                 .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, connectTimeout)
